@@ -34,5 +34,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	UProjectileMovementComponent* ProjectileMovement;
 
-	void MakeShot(FVector ShootDirection);
+	virtual void MakeShot(FVector ShootDirection);
 };

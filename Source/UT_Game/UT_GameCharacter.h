@@ -19,6 +19,9 @@ class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFirePressed);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFireReleased);
+
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
@@ -52,6 +55,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputAction* FireStartAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	FOnFirePressed OnFirePressed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	FOnFireReleased OnFireReleased;
+
 	
 public:
 	AUT_GameCharacter();
@@ -59,6 +69,7 @@ public:
 	USceneComponent* WeaponAttachPoint;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
 	UUT_WeaponComponent* WeaponComponent;
+	
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -78,6 +89,12 @@ public:
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 	void Fire(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void HandleFirePressed();
+
+	UFUNCTION()
+	void HandleFireReleased();
 
 };
 

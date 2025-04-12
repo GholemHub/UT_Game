@@ -37,10 +37,31 @@ void UUT_WeaponComponent::BeginPlay()
 	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
 	if (!OwnerCharacter) return; // Fixed missing semicolon
 
+
+
 	EquipWeapon(OwnerCharacter);
+
+    AUT_GameCharacter* Player = Cast<AUT_GameCharacter>(GetOwner());
+    if (Player)
+    {
+        Player->OnFirePressed.AddDynamic(this, &UUT_WeaponComponent::HandleFirePressed);
+        Player->OnFireReleased.AddDynamic(this, &UUT_WeaponComponent::HandleFireReleased);
+    }
 }
 
+void UUT_WeaponComponent::HandleFirePressed()
+{
+    GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("DELEGATE 1"));
+    bIsShoot = true;
+    FireStart();
+}
 
+void UUT_WeaponComponent::HandleFireReleased()
+{
+    GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("DELEGATE 2"));
+    bIsShoot = false;
+    // Optional: Logic to stop shooting, stop charging, etc.
+}
 // Called every frame
 void UUT_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -49,13 +70,8 @@ void UUT_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 }
 void UUT_WeaponComponent::FireStart()
 {
-    /*if (!bCanFire) return;
-    bCanFire = false;*/
-   
-    
     if (!FlakWeapon) return;
     FlakWeapon->Fire();   
-
 }
 
 void UUT_WeaponComponent::EquipWeapon(ACharacter* Owner)
@@ -70,34 +86,18 @@ void UUT_WeaponComponent::EquipWeapon(ACharacter* Owner)
 
     //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("2"));
     auto Player = Cast<AUT_GameCharacter>(Owner);
-    if (!Player) return;  // Check if the Player is valid
+    if (!Player) return;
 
-    // Debugging WeaponAttachPoint
-    if (!Player->WeaponAttachPoint)
-    {
-        //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("WeaponAttachPoint is NULL!"));
-        return;
-    }
+    if (!Player->WeaponAttachPoint) return;
 
     // Debugging spawn location
     FVector SpawnLocation = Player->WeaponAttachPoint->GetComponentLocation();
     FRotator SpawnRotation = Player->WeaponAttachPoint->GetComponentRotation();
 
-    // Add debug message to verify spawn location and rotation
-    FString LocationMessage = FString::Printf(TEXT("SpawnLocation: %s"), *SpawnLocation.ToString());
-    FString RotationMessage = FString::Printf(TEXT("SpawnRotation: %s"), *SpawnRotation.ToString());
-
-    GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, LocationMessage);
-    GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, RotationMessage);
-
-    // Spawn weapon at WeaponAttachPoint location
     FlakWeapon = GetWorld()->SpawnActor<AUT_Flak>(Weapon, SpawnLocation, SpawnRotation, SpawnParams);
 
     if (!FlakWeapon) return;
 
-    //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("3"));
-
-    // Attach the weapon to WeaponAttachPoint after spawning it
     FlakWeapon->AttachToComponent(Player->WeaponAttachPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
     FlakWeapon->SetActorHiddenInGame(false);

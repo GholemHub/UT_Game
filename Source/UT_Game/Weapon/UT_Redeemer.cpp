@@ -1,62 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "../Weapon/UT_Flak.h"
-#include "../Weapon/UT_Flak_Projectile.h"
+#include "../Weapon/UT_Redeemer.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
 #include "../UT_GameCharacter.h"
 
-#include "Engine/Engine.h"
 
-
-// Sets default values
-AUT_Flak::AUT_Flak()
+void AUT_Redeemer::Fire()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-	//RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
-	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
-	//MeshComponent->SetupAttachment(RootComponent);
-
-	FirePoint = CreateDefaultSubobject<USceneComponent>(TEXT("FirePoint"));
-	FirePoint->SetupAttachment(MeshComponent);
-
-
-}
-
-// Called when the game starts or when spawned
-void AUT_Flak::BeginPlay()
-{
-	Super::BeginPlay();
-	if (MeshComponent)
-	{
-
-		OriginalRelativeLocation = MeshComponent->GetComponentLocation();
-	}
-}
-
-// Called every frame
-void AUT_Flak::Tick(float DeltaTime)
-{
-	if (bShouldRecover)
-	{
-		FVector CurrentLocation = MeshComponent->GetComponentLocation();
-		FVector NewLocation = FMath::VInterpTo(CurrentLocation, OriginalRelativeLocation, DeltaTime, 30.0f);
-		MeshComponent->SetWorldLocation(NewLocation);
-
-		if (FVector::Dist(NewLocation, OriginalRelativeLocation) < 0.1f)
-		{
-			MeshComponent->SetWorldLocation(OriginalRelativeLocation);
-			bShouldRecover = false;
-		}
-	}
-}
-
-void AUT_Flak::Fire()
-{
-	
 	if (!bCanFire) return;
 
 	bCanFire = false;
@@ -95,7 +48,7 @@ void AUT_Flak::Fire()
 	{
 		ShootDirection = WorldDirection;  // Use forward direction if no hit
 	}
-	 
+
 	if (!Projectile) return;
 
 	AActor* OwnerActor = GetOwner();
@@ -126,52 +79,18 @@ void AUT_Flak::Fire()
 					Pr->MakeShot(ShootDirection);
 					//MakeWeaponShake();
 				}
-				
+
 			}
 		}
 	}
-	GetWorldTimerManager().SetTimer(FireRateHandle, this, &AUT_Flak::ResetFire, 1.0f, false);
-
+	GetWorldTimerManager().SetTimer(FireRateHandle, this, &AUT_Redeemer::ResetFire, 0.1f, false);
 }
 
-void AUT_Flak::MakeWeaponShake()
-{
-	FVector ShakeOffset = FVector(
-		FMath::RandRange(-3.0f, 1.0f),
-		FMath::RandRange(-3.0f, 1.0f),
-		FMath::RandRange(-1.0f, 1.0f)
-	);
-	//MeshComponent->AddLocalOffset(ShakeOffset);
-	MeshComponent->SetWorldLocation(MeshComponent->GetComponentLocation() + ShakeOffset);
-
-	bShouldRecover = 1;
-}
-
-void AUT_Flak::ResetFire()
+void AUT_Redeemer::ResetFire()
 {
 	bCanFire = true;
 	if (GetPlayer()->WeaponComponent->bIsShoot)
 	{
 		Fire();
 	}
-}
-
-AUT_GameCharacter* AUT_Flak::GetPlayer()
-{
-	AActor* OwnerActor = GetOwner();
-	if (OwnerActor)
-	{
-		APawn* OwnerPawn = Cast<APawn>(OwnerActor);
-		if (OwnerPawn)
-		{
-			AController* OwnerController = OwnerPawn->GetController();
-			if (OwnerController && OwnerController->IsPlayerController())
-			{
-				auto Player = Cast<AUT_GameCharacter>(OwnerPawn);
-				if (!Player) return nullptr;
-				return Player;
-			}
-		}
-	}
-	return nullptr;
 }

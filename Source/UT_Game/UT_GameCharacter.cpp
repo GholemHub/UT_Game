@@ -72,6 +72,9 @@ void AUT_GameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AUT_GameCharacter::Look);
+		
+		EnhancedInputComponent->BindAction(FireStartAction, ETriggerEvent::Started, this, &AUT_GameCharacter::HandleFirePressed);
+		EnhancedInputComponent->BindAction(FireStartAction, ETriggerEvent::Completed, this, &AUT_GameCharacter::HandleFireReleased);
 	}
 	else
 	{
@@ -111,9 +114,6 @@ void AUT_GameCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	if (!WeaponComponent) return;
-	//WeaponComponent->EquipWeapon(this);
-
-
 }
 
 void AUT_GameCharacter::Fire(const FInputActionValue& Value)
@@ -122,4 +122,20 @@ void AUT_GameCharacter::Fire(const FInputActionValue& Value)
     auto Weapon = Cast<UUT_WeaponComponent>(WeaponComponent);
 	if (!Weapon) return;
 	Weapon->FireStart();
+}
+
+void AUT_GameCharacter::HandleFirePressed()
+{
+	// Broadcast to listeners
+	OnFirePressed.Broadcast();
+
+	// Optional: Trigger immediate weapon fire if needed
+}
+
+void AUT_GameCharacter::HandleFireReleased()
+{
+	// Broadcast to listeners
+	OnFireReleased.Broadcast();
+
+	// Optional: Stop firing, stop charging, etc.
 }

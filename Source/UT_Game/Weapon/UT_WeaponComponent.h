@@ -30,7 +30,13 @@ public:
 	TSubclassOf<AUT_Flak> Weapon;
 	UPROPERTY()
 	AUT_Flak* FlakWeapon;
-	void FireStart();
+	virtual void FireStart();
+
+	bool bIsShoot = false;
 private:
-	
+	UFUNCTION()
+	void HandleFirePressed();
+
+	UFUNCTION()
+	void HandleFireReleased();
 };

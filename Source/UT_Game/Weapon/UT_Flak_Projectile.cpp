@@ -21,6 +21,9 @@ AUT_Flak_Projectile::AUT_Flak_Projectile()
 	ProjectileMovement->MaxSpeed = 6000.0f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
+
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("BooM"));
+
 }
 
 // Called when the game starts or when spawned

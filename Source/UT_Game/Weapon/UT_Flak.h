@@ -33,8 +33,15 @@ public:
 	USceneComponent* FirePoint;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	TSubclassOf<AUT_Flak_Projectile> Projectile;
-	void Fire();
+	virtual void Fire();
 
-private:
+protected:
+	bool bCanFire = true;
+	FTimerHandle FireRateHandle;
+	bool bShouldRecover = false;
+	FVector OriginalRelativeLocation;
 
+	virtual void MakeWeaponShake();
+	virtual void ResetFire();
+	class AUT_GameCharacter* GetPlayer();
 };

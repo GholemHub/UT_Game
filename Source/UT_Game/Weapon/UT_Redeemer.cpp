@@ -63,7 +63,7 @@ void AUT_Redeemer::Fire()
 				auto Player = Cast<AUT_GameCharacter>(OwnerPawn);
 				if (!Player) return;
 				if (!GetWorld()) return;
-				auto WEPON = Player->WeaponComponent->FlakWeapon;
+				auto WEPON = Player->WeaponComponent->Weapon;
 				if (!WEPON) return;
 
 				auto POINT = WEPON->FirePoint->GetComponentLocation();

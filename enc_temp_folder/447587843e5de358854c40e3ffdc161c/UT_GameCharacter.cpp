@@ -65,20 +65,16 @@ void AUT_GameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(FireStartAction, ETriggerEvent::Started, this, &AUT_GameCharacter::Fire);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUT_GameCharacter::Move);
 
-		//Weapon
-		EnhancedInputComponent->BindAction(SwitchWeaponAction, ETriggerEvent::Triggered, this, &AUT_GameCharacter::SwitchWeapon);
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUT_GameCharacter::Move);
-		EnhancedInputComponent->BindAction(FireStartAction, ETriggerEvent::Started, this, &AUT_GameCharacter::Fire);
-		EnhancedInputComponent->BindAction(FireStartAction, ETriggerEvent::Started, this, &AUT_GameCharacter::HandleFirePressed);
-		EnhancedInputComponent->BindAction(FireStartAction, ETriggerEvent::Completed, this, &AUT_GameCharacter::HandleFireReleased);
-
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AUT_GameCharacter::Look);
 		
+		EnhancedInputComponent->BindAction(FireStartAction, ETriggerEvent::Started, this, &AUT_GameCharacter::HandleFirePressed);
+		EnhancedInputComponent->BindAction(FireStartAction, ETriggerEvent::Completed, this, &AUT_GameCharacter::HandleFireReleased);
 	}
 	else
 	{
@@ -142,9 +138,4 @@ void AUT_GameCharacter::HandleFireReleased()
 	OnFireReleased.Broadcast();
 
 	// Optional: Stop firing, stop charging, etc.
-}
-
-void AUT_GameCharacter::SwitchWeapon()
-{
-	WeaponComponent->SwitchWeapon();
 }

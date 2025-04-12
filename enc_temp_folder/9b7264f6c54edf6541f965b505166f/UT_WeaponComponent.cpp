@@ -16,8 +16,14 @@
 // Sets default values for this component's properties
 UUT_WeaponComponent::UUT_WeaponComponent()
 {
+	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+
+	//FlakWeapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
+
+	// ...
 }
 
 
@@ -26,8 +32,12 @@ void UUT_WeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
   
+  
+
 	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
 	if (!OwnerCharacter) return; // Fixed missing semicolon
+
+
 
 	EquipWeapon(OwnerCharacter);
 
@@ -36,17 +46,6 @@ void UUT_WeaponComponent::BeginPlay()
     {
         Player->OnFirePressed.AddDynamic(this, &UUT_WeaponComponent::HandleFirePressed);
         Player->OnFireReleased.AddDynamic(this, &UUT_WeaponComponent::HandleFireReleased);
-    }
-}
-
-void UUT_WeaponComponent::SwitchWeapon()
-{
-    CurrentWeaponIndex = (CurrentWeaponIndex + 1) % WeaponClasses.Num();
-
-    ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
-    if (OwnerCharacter)
-    {
-        EquipWeapon(OwnerCharacter);
     }
 }
 
@@ -61,6 +60,7 @@ void UUT_WeaponComponent::HandleFireReleased()
 {
     GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("DELEGATE 2"));
     bIsShoot = false;
+    // Optional: Logic to stop shooting, stop charging, etc.
 }
 // Called every frame
 void UUT_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -70,42 +70,38 @@ void UUT_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 }
 void UUT_WeaponComponent::FireStart()
 {
-    if (!Weapon) return;
-    Weapon->Fire();   
+    if (!FlakWeapon) return;
+    FlakWeapon->Fire();   
 }
 
 void UUT_WeaponComponent::EquipWeapon(ACharacter* Owner)
 {
-    if (WeaponClasses.Num() == 0 || !Owner) return;
+    GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("1"));
 
-    // Wrap index if out of bounds
-    if (CurrentWeaponIndex >= WeaponClasses.Num())
-    {
-        CurrentWeaponIndex = 0;
-    }
-
-    TSubclassOf<AUT_Flak> WeaponToSpawn = WeaponClasses[CurrentWeaponIndex];
-    if (!WeaponToSpawn) return;
-
-    auto Player = Cast<AUT_GameCharacter>(Owner);
-    if (!Player || !Player->WeaponAttachPoint) return;
+    if (!Weapon || !Owner) return;
 
     FActorSpawnParameters SpawnParams;
     SpawnParams.Owner = Owner;
     SpawnParams.Instigator = Owner->GetInstigator();
 
+    //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("2"));
+    auto Player = Cast<AUT_GameCharacter>(Owner);
+    if (!Player) return;
+
+    if (!Player->WeaponAttachPoint) return;
+
+    // Debugging spawn location
     FVector SpawnLocation = Player->WeaponAttachPoint->GetComponentLocation();
     FRotator SpawnRotation = Player->WeaponAttachPoint->GetComponentRotation();
 
-    if (Weapon)
-    {
-        Weapon->Destroy();
-    }
+    FlakWeapon = GetWorld()->SpawnActor<AUT_Flak>(Weapon, SpawnLocation, SpawnRotation, SpawnParams);
 
-    Weapon = GetWorld()->SpawnActor<AUT_Flak>(WeaponToSpawn, SpawnLocation, SpawnRotation, SpawnParams);
-    if (!Weapon) return;
+    if (!FlakWeapon) return;
 
-    Weapon->AttachToComponent(Player->WeaponAttachPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-    Weapon->SetActorHiddenInGame(false);
-    Weapon->MeshComponent->SetVisibility(true);
+    FlakWeapon->AttachToComponent(Player->WeaponAttachPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+    FlakWeapon->SetActorHiddenInGame(false);
+    FlakWeapon->MeshComponent->SetVisibility(true);
+
+    GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("4"));
 }

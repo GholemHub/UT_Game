@@ -53,9 +53,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* SwitchWeaponAction;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputAction* FireStartAction;
 
@@ -98,9 +95,6 @@ public:
 
 	UFUNCTION()
 	void HandleFireReleased();
-
-private:
-	void SwitchWeapon();
 
 };
 

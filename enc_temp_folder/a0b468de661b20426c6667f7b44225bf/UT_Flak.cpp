@@ -110,7 +110,7 @@ void AUT_Flak::Fire()
 				auto Player = Cast<AUT_GameCharacter>(OwnerPawn);
 				if (!Player) return;
 				if (!GetWorld()) return;
-				auto WEPON = Player->WeaponComponent->Weapon;
+				auto WEPON = Player->WeaponComponent->FlakWeapon;
 				if (!WEPON) return;
 
 				auto POINT = WEPON->FirePoint->GetComponentLocation();

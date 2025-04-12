@@ -26,16 +26,13 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void EquipWeapon(ACharacter*);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	TArray<TSubclassOf<AUT_Flak>> WeaponClasses;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	TSubclassOf<AUT_Flak> Weapon;
 	UPROPERTY()
-	AUT_Flak* Weapon;
-	int CurrentWeaponIndex = 0;
+	AUT_Flak* FlakWeapon;
 	virtual void FireStart();
 
 	bool bIsShoot = false;
-
-	void SwitchWeapon();
 private:
 	UFUNCTION()
 	void HandleFirePressed();
